@@ -2,27 +2,106 @@
 
 @{
     ViewData["Title"] = "Details";
+    decimal partialPrice;
+    decimal totalPrice = 0;
+    int itemNumber = 1;
 }
 
 <h2>Details</h2>
-
+<hr />
 <div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.DeliveryDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.DeliveryDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Discount)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Discount)
-        </dd>
-    </dl>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th>Product</th>
+                <th class="text-right">Price</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Partial price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                partialPrice = item.Price * item.Amount;
+                <tr>
+                    <td class="text-center">
+                        @(itemNumber++)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    </td>
+                    <td class="text-right">
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td class="text-right">
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td class="text-right">
+                        @partialPrice
+                    </td>
+                </tr>  
+                totalPrice += partialPrice;
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="text-right">
+                    <strong>Total price</strong> @totalPrice
+                </td>                
+            </tr>
+        </tfoot>
+    </table>
+    <div class="row text-center">
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Order code <br />
+                    <strong>@Model.Id</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Delivery date <br />
+                    <strong>@Model.DeliveryDate</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Quantity of itens<br />
+                    <strong>@(--itemNumber)</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Total price<br />
+                    <strong>@totalPrice</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Discount <br />
+                    <strong>@Model.Discount</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-primary">
+                <div class="panel-body text-primary">
+                    Order price <br />
+                    <strong>@(totalPrice - Model.Discount)</strong>
+                </div>
+            </div>
+        </div>
+    </div>    
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
