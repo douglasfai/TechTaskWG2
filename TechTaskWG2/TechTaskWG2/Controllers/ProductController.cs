@@ -34,7 +34,11 @@ namespace TechTaskWG2.Controllers
             }
 
             var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(s => s.Items)
+                .ThenInclude(e => e.Order)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.Id == id);
+
             if (product == null)
             {
                 return NotFound();
@@ -54,13 +58,20 @@ namespace TechTaskWG2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Description,Price")] Product product)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(product);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException exception)
+            {
+                ModelState.AddModelError("", "Problem saving: " + exception.Message);
             }
             return View(product);
         }
@@ -84,40 +95,34 @@ namespace TechTaskWG2.Controllers
         // POST: Product/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price")] Product product)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != product.Id)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var updateProduct = await _context.Products.SingleOrDefaultAsync(s => s.Id == id);
+            if (await TryUpdateModelAsync<Product>(updateProduct, "", s => s.Name, s => s.Description, s => s.Price))
             {
                 try
                 {
-                    _context.Update(product);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException exception)
                 {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "Problem updating: " + exception.Message);
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(product);
+
+            return View(updateProduct);
         }
 
         // GET: Product/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false, string errorMessage = "")
         {
             if (id == null)
             {
@@ -125,10 +130,17 @@ namespace TechTaskWG2.Controllers
             }
 
             var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.Id == id);
+
             if (product == null)
             {
                 return NotFound();
+            }
+
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] = string.Format("Deletion failed ({0}). Try again?", errorMessage);
             }
 
             return View(product);
@@ -139,10 +151,25 @@ namespace TechTaskWG2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var product = await _context.Products
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.Id == id);
+
+            if (product == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException exception)
+            {
+                return RedirectToAction("Delete", new { id = id, saveChangesError = true, errorMessage = exception.Message });
+            }
         }
 
         private bool ProductExists(int id)
