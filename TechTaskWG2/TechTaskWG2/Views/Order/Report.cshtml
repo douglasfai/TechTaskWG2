@@ -1,0 +1,68 @@
+﻿@model TechTaskWG2.ViewModels.Report
+
+@{
+    ViewData["Title"] = "Order Report";    
+}
+
+<h2>Order Report</h2>
+
+<div class="row text-center">
+    <div class="col-md-2 col-md-offset-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                Number of orders<br />
+                <strong>@Model.NumberOfOrders</strong>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                Total <br />
+                <strong>@Model.Total</strong>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Order code</th>
+                <th class="text-center">Delivery date</th>
+                <th class="text-right">Discount</th>
+                <th class="text-right">Order price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td class="text-center">
+                        @order.Number
+                    </td>
+                    <td class="text-center">
+                        @order.OrderCode
+                    </td>
+                    <td class="text-center">
+                        @order.DeliveryDate
+                    </td>
+                    <td class="text-right">
+                        @order.Discount
+                    </td>
+                    <td class="text-right">
+                        @order.OrderPrice
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="text-right">
+                    <strong>Total</strong> @Model.Total
+                </td>
+            </tr>
+        </tfoot>
+    </table>    
+</div>

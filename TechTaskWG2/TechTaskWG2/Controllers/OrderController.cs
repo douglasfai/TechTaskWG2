@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 using TechTaskWG2.Data;
 using TechTaskWG2.Models;
 
@@ -173,6 +171,49 @@ namespace TechTaskWG2.Controllers
             {
                 return RedirectToAction("Delete", new { id = id, saveChangesError = true, errorMessage = exception.Message });
             }
+        }
+
+        public async Task<IActionResult> Report()
+        {
+            var reportViewModel = new ViewModels.Report();
+            
+            var orders = await _context.Orders
+                .Include(s => s.Items)
+                .AsNoTracking()
+                .ToListAsync();
+
+            decimal orderPrice;
+            decimal total = 0;
+            int numberOfOrders = 1;
+
+            foreach(var order in orders)
+            {
+                //orderPrice = 0;
+                //foreach (var item in order.Items)
+                //{
+                //    orderPrice += item.Price * item.Amount;
+                //}
+
+                orderPrice = order.Items.Where(x => x.OrderId == order.Id).Sum(x => x.Price * x.Amount);
+                orderPrice -= order.Discount;
+                total += orderPrice;
+
+                var orderViewModel = new ViewModels.Order()
+                {
+                    Number = numberOfOrders++,
+                    OrderCode = order.Id,
+                    DeliveryDate = order.DeliveryDate,
+                    Discount = order.Discount,
+                    OrderPrice = orderPrice
+                };
+                
+                reportViewModel.Orders.Add(orderViewModel);
+            }
+
+            reportViewModel.Total = total;
+            reportViewModel.NumberOfOrders = --numberOfOrders;
+
+            return View(reportViewModel);
         }
 
         private bool OrderExists(int id)
