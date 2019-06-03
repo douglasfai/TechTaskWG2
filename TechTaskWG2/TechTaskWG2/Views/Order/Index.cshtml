@@ -13,11 +13,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DeliveryDate)
+            <th class="text-center">
+                Delivery date
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Discount)
+            <th class="text-right">
+                Discount
             </th>
             <th></th>
         </tr>
@@ -25,13 +25,13 @@
     <tbody>
         @foreach (var item in Model) {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeliveryDate)
+                <td class="text-center">
+                    @item.DeliveryDate.ToString("dd/MM/yyyy")
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Discount)
+                <td class="text-right">
+                    @item.Discount
                 </td>
-                <td>
+                <td class="text-center">
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>

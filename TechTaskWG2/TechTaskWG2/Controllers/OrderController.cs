@@ -48,7 +48,8 @@ namespace TechTaskWG2.Controllers
         // GET: Order/Create
         public IActionResult Create()
         {
-            ViewBag.Products = new SelectList(_context.Products.ToList(), "Id", "Name");
+            //ViewBag.Products = new SelectList(_context.Products.ToList(), "Id", "Name");
+            ViewBag.Products = _context.Products.ToList();
             return View();
         }
 
@@ -59,22 +60,36 @@ namespace TechTaskWG2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Order order)
         {
+            bool status = false;
+            string message = "";
+
+            order.Discount /= 100;
+            foreach (var item in order.Items)
+                item.Price /= 100;
+            
+
             try
             {
                 if (ModelState.IsValid)
                 {
                     _context.Add(order);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    status = true;
+                    message = "Saved successfully";
+                }
+                else
+                {
+                    message = "Problem saving. Please check the fields and try again...";
                 }
             }
             catch (DbUpdateException exception)
             {
-                ModelState.AddModelError("", "Problem saving: " + exception.Message);
+                //ModelState.AddModelError("", "Problem saving: " + exception.Message);
+                message = "Problem saving: " + exception.Message;
             }
 
-            //return View(order);
-            return Json(true);
+            //return View(order);            
+            return Json(new { status = status, message = message });
         }
 
         // GET: Order/Edit/5

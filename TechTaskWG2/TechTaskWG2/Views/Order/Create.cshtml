@@ -12,47 +12,61 @@
     <div class="col-md-12">
         <form>
             @Html.AntiForgeryToken()
-            <div class="form-inline">
+            <div class="form-inline text-center">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="DeliveryDate" class="control-label"></label>
-                    <input asp-for="DeliveryDate" class="form-control" id="deliveryDate" />
+                    <label class="control-label">Delivery date</label>
+                    @*<input asp-for="DeliveryDate" class="form-control" id="deliveryDate" />*@
+                    <input type="date" class="form-control" id="deliveryDate" />
                     <span asp-validation-for="DeliveryDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="Discount" class="control-label"></label>
-                    <input asp-for="Discount" class="form-control" id="discount" value="0" onblur="CalculateTotalPrice();" />
-                    <span asp-validation-for="Discount" class="text-danger"></span>
+                    <input type="text" class="form-control text-right" id="discount" value="0,00" onblur="CalculateTotalPrice();" />
                 </div>
-
                 <div class="form-group">
-                    <label for="totalPrice">Preço total (R$)</label>
-                    <input type="text" class="form-control" id="totalPrice" readonly>
+                    <label for="totalPrice">Total price</label>
+                    <input type="text" class="form-control text-right" id="totalPrice" value="0,00" readonly>
                 </div>
+                <a id="buttonSave" class="btn btn-primary" onclick="Save();" disabled="true"><span class="glyphicon glyphicon-floppy-disk"></span> Add order</a>
             </div>
-            <div class="form-inline">
+            <hr />
+            <div id="errorMessage"></div>
+            <div class="form-inline text-center">
                 <div class="form-group">
-                    <label for="product">Produto</label>
-                    <select asp-items="@ViewBag.Products" id="product" class="form-control"></select>
+                    <label for="product">Product</label>
+                    @*<select asp-items="@ViewBag.Products" id="product" class="form-control">
+                    <option>Select a product</option>
+                </select>*@
+                    <select id="product" class="form-control" onchange="InsertPrice();">
+                        <option value="0">Select a product</option>
+                        @foreach (var item in ViewBag.Products)
+                        {
+                            <option value="@item.Id" data-price="@item.Price">@item.Name</option>
+                        }
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="price">Preço (R$)</label>
-                    <input type="text" class="form-control" id="price" required>
+                    <label for="unitPrice">Unit price</label>
+                    <input type="text" class="form-control text-right" id="unitPrice" required readonly>
                 </div>
                 <div class="form-group">
                     <label for="amount">Amount</label>
-                    <input type="text" class="form-control" id="amount" required>
+                    <input type="text" class="form-control text-right" id="amount" required>
                 </div>
-                <a class="btn btn-default" onclick="AddItem();">Inserir item</a>
+                <a class="btn btn-default" onclick="AddItem();"><span class="glyphicon glyphicon-plus"></span> Insert item</a>
             </div>
-            <div id="errorMessage"></div>
-            <div id="items"></div>
-
-            <a id="buttonSave" class="btn btn-primary" onclick="Save();" disabled="true">Salvar pedido</a>
+            <hr />
+            <table id="items" class="table">
+                <thead>
+                    <tr><th>Product</th><th class="text-right">Unit price</th><th class="text-right">Amount</th><th class="text-right">Partial price</th><th class="text-center">Remove</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>                
         </form>
     </div>
 </div>
-
+<hr />
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
