@@ -29,9 +29,7 @@ function AddItem() {
         errorMessage += "Product is required. ";
     if (!(parseInt(amount) > 0))
         errorMessage += "Invalid amount. ";
-    //if (!(parseFloat(unitPrice) >= 0))
-    //    errorMessage += "Invalid price. ";
-
+    
     if (errorMessage != '') {
         $('#errorMessage').html('<p class="alert alert-danger text-center">' + errorMessage + '</p>');
         return false;
@@ -88,8 +86,7 @@ function CalculateTotalPrice() {
     var partialPrice;
     var totalPrice = 0;
     var discount = stringToNumber($("#discount").val());
-    //$('#discount').val(discount);
-
+    
     var itemsLength = items.length;
 
     if (itemsLength > 0) {
@@ -100,7 +97,6 @@ function CalculateTotalPrice() {
     }
 
     if (!(discount >= 0)) {
-        //$('#errorMessage').html('<p class="alert alert-danger text-center">Discount is not valid!</p>');
         $('#discount').val('0,00');
         $('#totalPrice').val(numberToString(totalPrice));
         return false;
