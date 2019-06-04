@@ -17,15 +17,15 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <div class="form-group">
-                    <label class="control-label">Delivery date</label>
+                    <label id="deliveryDate" class="control-label">Delivery date</label>
                     <input type="date" class="form-control" id="deliveryDate" value="@Model.DeliveryDate.ToString("yyyy-MM-dd")" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="Discount" class="control-label"></label>
+                    <label for="discount" class="control-label">Discount (R$)</label>
                     <input type="text" class="form-control text-right" id="discount" value="@Model.Discount" onblur="CalculateTotalPrice();" />
                 </div>
                 <div class="form-group">
-                    <label for="totalPrice">Total price</label>
+                    <label for="totalPrice">Total price (R$)</label>
                     <input type="text" class="form-control text-right" id="totalPrice" readonly>
                 </div>
                 <a id="buttonSave" class="btn btn-primary" onclick="Save();" disabled="true"><span class="glyphicon glyphicon-floppy-disk"></span> Add order</a>
@@ -44,7 +44,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="unitPrice">Unit price</label>
+                    <label for="unitPrice">Unit price (R$)</label>
                     <input type="text" class="form-control text-right" id="unitPrice" required readonly>
                 </div>
                 <div class="form-group">

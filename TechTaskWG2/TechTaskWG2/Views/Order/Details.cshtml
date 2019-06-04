@@ -15,9 +15,9 @@
             <tr>
                 <th class="text-center">#</th>
                 <th>Product</th>
-                <th class="text-right">Price</th>
+                <th class="text-right">Price (R$)</th>
                 <th class="text-right">Amount</th>
-                <th class="text-right">Partial price</th>
+                <th class="text-right">Partial price (R$)</th>
             </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@
         <tfoot>
             <tr>
                 <td colspan="5" class="text-right">
-                    <strong>Total price</strong> @totalPrice
+                    <strong>Total price</strong> R$ @totalPrice
                 </td>                
             </tr>
         </tfoot>
@@ -80,7 +80,7 @@
         <div class="col-md-2">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    Total price<br />
+                    Total price (R$)<br />
                     <strong>@totalPrice</strong>
                 </div>
             </div>
@@ -88,7 +88,7 @@
         <div class="col-md-2">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    Discount <br />
+                    Discount (R$)<br />
                     <strong>@Model.Discount</strong>
                 </div>
             </div>
@@ -96,7 +96,7 @@
         <div class="col-md-2">
             <div class="panel panel-primary">
                 <div class="panel-body text-primary">
-                    Order price <br />
+                    Order price (R$)<br />
                     <strong>@(totalPrice - Model.Discount)</strong>
                 </div>
             </div>

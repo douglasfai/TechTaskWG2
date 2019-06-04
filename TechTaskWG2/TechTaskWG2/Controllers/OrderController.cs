@@ -48,7 +48,6 @@ namespace TechTaskWG2.Controllers
         // GET: Order/Create
         public IActionResult Create()
         {
-            //ViewBag.Products = new SelectList(_context.Products.ToList(), "Id", "Name");
             ViewBag.Products = _context.Products.ToList();
             return View();
         }
@@ -65,8 +64,7 @@ namespace TechTaskWG2.Controllers
 
             order.Discount /= 100;
             foreach (var item in order.Items)
-                item.Price /= 100;
-            
+                item.Price /= 100;            
 
             try
             {
@@ -84,11 +82,9 @@ namespace TechTaskWG2.Controllers
             }
             catch (DbUpdateException exception)
             {
-                //ModelState.AddModelError("", "Problem saving: " + exception.Message);
                 message = "Problem saving: " + exception.Message;
             }
 
-            //return View(order);            
             return Json(new { status = status, message = message });
         }
 
@@ -225,12 +221,6 @@ namespace TechTaskWG2.Controllers
 
             foreach(var order in orders)
             {
-                //orderPrice = 0;
-                //foreach (var item in order.Items)
-                //{
-                //    orderPrice += item.Price * item.Amount;
-                //}
-
                 orderPrice = order.Items.Where(x => x.OrderId == order.Id).Sum(x => x.Price * x.Amount);
                 orderPrice -= order.Discount;
                 total += orderPrice;

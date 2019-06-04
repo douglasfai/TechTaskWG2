@@ -15,15 +15,15 @@
             <div class="form-inline text-center">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label class="control-label">Delivery date</label>
+                    <label id="deliveryDate" class="control-label">Delivery date</label>
                     <input type="date" class="form-control" id="deliveryDate" />                    
                 </div>
                 <div class="form-group">
-                    <label asp-for="Discount" class="control-label"></label>
+                    <label for="discount" class="control-label">Discount (R$)</label>
                     <input type="text" class="form-control text-right" id="discount" value="0,00" onblur="CalculateTotalPrice();" />
                 </div>
                 <div class="form-group">
-                    <label for="totalPrice">Total price</label>
+                    <label for="totalPrice" class="control-label">Total price (R$)</label>
                     <input type="text" class="form-control text-right" id="totalPrice" value="0,00" readonly>
                 </div>
                 <a id="buttonSave" class="btn btn-primary" onclick="Save();" disabled="true"><span class="glyphicon glyphicon-floppy-disk"></span> Add order</a>
@@ -33,9 +33,6 @@
             <div class="form-inline text-center">
                 <div class="form-group">
                     <label for="product">Product</label>
-                    @*<select asp-items="@ViewBag.Products" id="product" class="form-control">
-                    <option>Select a product</option>
-                </select>*@
                     <select id="product" class="form-control" onchange="InsertPrice();">
                         <option value="0">Select a product</option>
                         @foreach (var item in ViewBag.Products)
@@ -45,7 +42,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="unitPrice">Unit price</label>
+                    <label for="unitPrice">Unit price (R$)</label>
                     <input type="text" class="form-control text-right" id="unitPrice" required readonly>
                 </div>
                 <div class="form-group">
