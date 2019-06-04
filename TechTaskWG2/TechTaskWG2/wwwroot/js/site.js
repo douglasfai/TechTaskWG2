@@ -48,7 +48,7 @@ function ListItems() {
     if (itemsLength > 0) {
         for (var i = 0; i < itemsLength; i++) {
             partialPrice = items[i].Amount * items[i].Price;
-            itemsTable += '<tr><td>' + items[i].productName + '</td><td class="text-right">' + numberToString(items[i].Price) + '</td><td class="text-right">' + items[i].Amount + '</td><td class="text-right">' + numberToString(partialPrice) + '</td><td class="text-center"><a class="btn btn-danger" onclick="RemoveItem(' + i + ')"><span class="glyphicon glyphicon-remove"></span> Remove</a></td></tr>'
+            itemsTable += '<tr><td class="text-center">' + items[i].ProductId + '</td><td>' + items[i].productName + '</td><td class="text-right">' + numberToString(items[i].Price) + '</td><td class="text-right">' + items[i].Amount + '</td><td class="text-right">' + numberToString(partialPrice) + '</td><td class="text-center"><a class="btn btn-danger" onclick="RemoveItem(' + i + ')"><span class="glyphicon glyphicon-remove"></span> Remove</a></td></tr>'
         }
     }
     $('#items tbody').html(itemsTable);
@@ -137,17 +137,27 @@ function Save() {
             Items: items,
             __RequestVerificationToken: token
         };
+
+        var url = '/Order/Create';
+
+        var id = $('#Id').val();
+        if (id != null && id > 0) {
+            data.Id = id;
+            url = '/Order/Edit';
+        }
+            
         console.log(data);
         $.ajax({
             type: 'POST',
             datatype: 'json',
             headers: headers,
-            url: '/Order/Create',
+            url: url,
             data: data,
             success: function (result) {
-                if (result.status) {
-                    ClearOrderFields();
+                if (result.status) {                    
                     alert(result.message);
+                    if (id == null)
+                        ClearOrderFields();
                 } else {
                     $('#errorMessage').html('<p class="alert alert-danger text-center">' + result.message + '</p>');
                 }                

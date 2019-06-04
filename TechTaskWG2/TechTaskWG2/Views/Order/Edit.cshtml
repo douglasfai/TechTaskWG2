@@ -8,27 +8,76 @@
 
 <h4>Order</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="DeliveryDate" class="control-label"></label>
-                <input asp-for="DeliveryDate" class="form-control" />
-                <span asp-validation-for="DeliveryDate" class="text-danger"></span>
+    <div class="col-md-12">
+        <form>
+            @Html.AntiForgeryToken()
+            <div class="form-inline text-center">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label class="control-label">Delivery date</label>
+                    <input type="date" class="form-control" id="deliveryDate" value="@Model.DeliveryDate.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Discount" class="control-label"></label>
+                    <input type="text" class="form-control text-right" id="discount" value="@Model.Discount" onblur="CalculateTotalPrice();" />
+                </div>
+                <div class="form-group">
+                    <label for="totalPrice">Total price</label>
+                    <input type="text" class="form-control text-right" id="totalPrice" readonly>
+                </div>
+                <a id="buttonSave" class="btn btn-primary" onclick="Save();" disabled="true"><span class="glyphicon glyphicon-floppy-disk"></span> Add order</a>
             </div>
-            <div class="form-group">
-                <label asp-for="Discount" class="control-label"></label>
-                <input asp-for="Discount" class="form-control" />
-                <span asp-validation-for="Discount" class="text-danger"></span>
+            <hr />
+            <div id="errorMessage"></div>
+            <div class="form-inline text-center">
+                <div class="form-group">
+                    <label for="product">Product</label>                    
+                    <select id="product" class="form-control" onchange="InsertPrice();">
+                        <option value="0">Select a product</option>
+                        @foreach (var item in ViewBag.Products)
+                        {
+                            <option value="@item.Id" data-price="@item.Price">@item.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="unitPrice">Unit price</label>
+                    <input type="text" class="form-control text-right" id="unitPrice" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="text" class="form-control text-right" id="amount" required>
+                </div>
+                <a class="btn btn-default" onclick="AddItem();"><span class="glyphicon glyphicon-plus"></span> Insert item</a>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
+            <hr />
+            <table id="items" class="table">
+                <thead>
+                    <tr><th class="text-center">Product code</th><th>Product</th><th class="text-right">Unit price</th><th class="text-right">Amount</th><th class="text-right">Partial price</th><th class="text-center">Remove</th></tr>
+                </thead>
+                <tbody>
+                    @{                         
+                        foreach (var item in Model.Items)
+                        {
+                        <tr>
+                            <td class="text-center">@item.Product.Id</td>
+                            <td>@item.Product.Name</td>
+                            <td class="text-right">@item.Price</td>
+                            <td class="text-right">@item.Amount</td>
+                            <td class="text-right">@(item.Price * item.Amount)</td>
+                            <td class="text-center"><a class="btn btn-danger" onclick="RemoveItem()"><span class="glyphicon glyphicon-remove"></span> Remove</a></td>
+                        </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </form>
     </div>
 </div>
+<hr />
 
 <div>
     <a asp-action="Index">Back to List</a>

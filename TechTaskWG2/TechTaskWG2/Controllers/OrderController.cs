@@ -100,11 +100,19 @@ namespace TechTaskWG2.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(s => s.Items)
+                .ThenInclude(e => e.Product)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.Id == id);
+
             if (order == null)
             {
                 return NotFound();
             }
+                        
+            ViewBag.Products = _context.Products.ToList();
+            
             return View(order);
         }
 
@@ -113,28 +121,42 @@ namespace TechTaskWG2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int? id)
+        public async Task<IActionResult> EditPost(Order order)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            bool status = false;
+            string message = "";
 
-            var updateOrder = await _context.Orders.SingleOrDefaultAsync(s => s.Id == id);
-            if (await TryUpdateModelAsync<Order>(updateOrder, "", s => s.DeliveryDate, s => s.Discount))
+            var updateOrder = await _context.Orders
+                .Include(s => s.Items)
+                .SingleOrDefaultAsync(s => s.Id == order.Id);
+
+            updateOrder.DeliveryDate = order.DeliveryDate;
+            updateOrder.Discount = order.Discount;
+            updateOrder.Items = order.Items;
+
+            if (await TryUpdateModelAsync<Order>(updateOrder))
             {
                 try
                 {
+                    updateOrder.Discount /= 100;
+                    foreach (var item in updateOrder.Items)
+                        item.Price /= 100;
+
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    status = true;
+                    message = "Successfully updated";
                 }
                 catch (DbUpdateException exception)
                 {
-                    ModelState.AddModelError("", "Problem updating: " + exception.Message);
+                    message = "Problem updating: " + exception.Message;
                 }
             }
-
-            return View(updateOrder);
+            else
+            {
+                message = "Problem updating. Please check the fields and try again...";
+            }
+                                   
+            return Json(new { status = status, message = message });
         }
 
         // GET: Order/Delete/5
